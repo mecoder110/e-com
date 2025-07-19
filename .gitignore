@@ -6,6 +6,9 @@ target/
 *.ear
 *.log
 
+# Ignore uploaded images
+image/
+
 # IDEs
 .idea/
 *.iml
