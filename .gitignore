@@ -1,0 +1,28 @@
+# Java and Spring Boot
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Build tools
+.gradle/
+build/
+out/
+
+# Environment
+.env
+application-*.yml
+application-*.properties
