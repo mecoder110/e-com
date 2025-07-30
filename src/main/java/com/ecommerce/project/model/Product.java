@@ -5,12 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.generator.Generator;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "products")
 @ToString
 public class Product {
 
@@ -28,6 +27,11 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private User user;
 
 
 }

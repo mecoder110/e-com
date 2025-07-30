@@ -52,21 +52,37 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO saveProduct(ProductDTO productDTO, Long categoryId) {
-        Boolean isProductExist = productRepository.existsByProductName(productDTO.getProductName());
-
-        if (isProductExist) throw new APIException("Inserted Product dublicate, Already Exist");
+        //Boolean isProductExist = productRepository.existsByProductName(productDTO.getProductName());
+        // 1st way of validation
+        // if (isProductExist) throw new APIException("Inserted Product dublicate, Already Exist");
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NoResourceFoundException("Category", "Not found", categoryId));
-        Product product = modelMapper.map(productDTO, Product.class);
+        // 2nd way of validation
+        log.info("==============");
+        List<Product> products = category.getProducts();
+        log.info("==============");
+        boolean isProductNotExist = true;
+        for (Product product : products) {
+            if (product.getProductName().equalsIgnoreCase(productDTO.getProductName())) {
+                isProductNotExist = false;
+                break;
+            }
+        }
+        if (isProductNotExist) {
+            Product product = modelMapper.map(productDTO, Product.class);
 
-        Double specialPrice = product.getPrice() * (1 - product.getDiscount() / 100.0);
+            Double specialPrice = product.getPrice() * (1 - product.getDiscount() / 100.0);
 
-        product.setSpecialPrice(specialPrice);
-        product.setCategory(category);
-        Product save = productRepository.save(product);
-        ProductDTO saveDTO = modelMapper.map(save, ProductDTO.class);
-        System.out.println("===> " + saveDTO.getSpecialPrice());
-        return saveDTO;
+            product.setSpecialPrice(specialPrice);
+            product.setCategory(category);
+            Product save = productRepository.save(product);
+            ProductDTO saveDTO = modelMapper.map(save, ProductDTO.class);
+            System.out.println("===> " + saveDTO.getSpecialPrice());
+            return saveDTO;
+        } else {
+            throw new APIException("Product already Exist");
+        }
+
     }
 
     @Override
