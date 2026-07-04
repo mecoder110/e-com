@@ -1,9 +1,13 @@
 package com.ecommerce.project.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")
+@NoArgsConstructor
+@Data
 public class Role {
 
     @Id
@@ -12,10 +16,10 @@ public class Role {
     private Long roleId;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private AppRole role;
+    @Column(length = 20, name = "role_name")
+    private AppRole roleName;
 
     public Role(AppRole role) {
-        this.role = role;
+        this.roleName = role;
     }
 }

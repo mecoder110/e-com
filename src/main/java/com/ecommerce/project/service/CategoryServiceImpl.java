@@ -6,6 +6,7 @@ import com.ecommerce.project.model.Category;
 import com.ecommerce.project.payload.CategoryDTO;
 import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.repository.CategoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
@@ -52,14 +54,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void createCategory(CategoryDTO categoryDTO) {
+    public String createCategory(CategoryDTO categoryDTO) {
         Category category = mapper.map(categoryDTO, Category.class);
-
+        log.info("=== Indisde Create Category ===");
         Category getCategory = categoryRepository.findByCategoryName(category.getCategoryName());
         if (getCategory != null) {
             throw new APIException("Category is already exist with category name " + category.getCategoryName());
         }
         Category save = categoryRepository.save(category);
+        if (save.getCategoryName() == null) {
+            throw new APIException("Failed to create category with category name " + category.getCategoryName());
+        }
+        return "Category created successfully";
     }
 
     @Override

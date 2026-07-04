@@ -9,7 +9,7 @@ public interface CategoryService {
 
     CategoryResponse getCategoryList(Integer pageNumber, Integer pageSize, String sortOrder, String sortBy);
 
-    void createCategory(CategoryDTO categoryDTO);
+    String createCategory(CategoryDTO categoryDTO);
 
     String deleteCategory(Long id);
 
