@@ -22,7 +22,6 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     CategoryRepository categoryRepository;
-
     @Autowired
     ModelMapper mapper;
 
@@ -34,21 +33,25 @@ public class CategoryServiceImpl implements CategoryService {
                 : Sort.by(sortBy).descending();
 
         Pageable pageDetails = PageRequest.of(pageNumber, pageSize, sortByAndOrder);
-        Page<Category> all = categoryRepository.findAll(pageDetails);
-        //List<Category> all = categoryRepository.findAll();
-        if (all == null || all.isEmpty()) {
-            throw new APIException("Category not created yet to get");
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
+        //List<Category> categoryPage = categoryRepository.findAll();
+        List<Category> categories = categoryPage.getContent();
+        if (categories.isEmpty()) {
+            throw new APIException("Category not created yet");
         }
-        List<CategoryDTO> listCategoryDto = all.stream().map(c ->
-                mapper.map(c, CategoryDTO.class)
+        List<CategoryDTO> listCategoryDto = categories.stream().map(
+                category -> {
+                    return mapper.map(category, CategoryDTO.class);
+
+                }
         ).toList();
 
         CategoryResponse responseCategory = new CategoryResponse();
         responseCategory.setCategoryDTOS(listCategoryDto);
         responseCategory.setPageNumber(pageDetails.getPageNumber());
         responseCategory.setPageSize(pageDetails.getPageSize());
-        responseCategory.setTotalElements(all.getTotalElements());
-        responseCategory.setLastPage(all.isLast());
+        responseCategory.setTotalElements(categoryPage.getTotalElements());
+        responseCategory.setLastPage(categoryPage.isLast());
 
         return responseCategory;
     }

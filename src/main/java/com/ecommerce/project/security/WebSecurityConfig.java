@@ -1,7 +1,8 @@
 package com.ecommerce.project.security;
 
 import com.ecommerce.project.security.jwt.AuthEntryPointJwt;
-import com.ecommerce.project.security.jwt.AuthTokenCustomFilter;
+import com.ecommerce.project.security.jwt.AuthenticateJwtTokenFilter;
+import com.ecommerce.project.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +26,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private AuthEntryPointJwt authEntryPointJwt;
     @Autowired
-    public AuthTokenCustomFilter authTokenCustomFilter;
+    public AuthenticateJwtTokenFilter authenticateJwtTokenFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -59,7 +60,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(("/v3/api-docs/**")).permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers("api/admin/**").permitAll()
-                                .requestMatchers(("api/public/**")).permitAll()
+                                //.requestMatchers(("api/public/**")).permitAll()
                                 .requestMatchers("/v3/api-docs/**",
                                         "/swagger-ui/**",
                                         "/swagger-ui.html").permitAll()
@@ -68,10 +69,12 @@ public class WebSecurityConfig {
                                 .anyRequest().authenticated()
                 );
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authTokenCustomFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticateJwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.headers(headers -> headers.frameOptions(
+                frameOptions -> frameOptions.sameOrigin()));
+
         return http.build();
     }
-
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -82,5 +85,4 @@ public class WebSecurityConfig {
                 "/h2-console/**",
                 "/webjars/**"));
     }
-
 }
