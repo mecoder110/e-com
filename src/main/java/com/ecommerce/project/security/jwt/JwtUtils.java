@@ -1,5 +1,6 @@
 package com.ecommerce.project.security.jwt;
 
+import com.ecommerce.project.security.service.UserDetailsImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -12,8 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -28,6 +31,8 @@ public class JwtUtils {
 
     @Value("${spring.security.secret}")
     private String secretKey;
+    @Value("${spring.security.jwtCookieName}")
+    private String jwtCookie;
 
     // get JWT FromHeader
     public String getJwtFromHeader(HttpServletRequest request) {
@@ -39,7 +44,30 @@ public class JwtUtils {
         }
         return null;
     }
-    
+
+    public String getJwtFromCookie(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+        if (cookie != null) return cookie.getValue();
+        return null;
+
+    }
+
+    // generate Cookie
+    public ResponseCookie generateJwtCookie(UserDetailsImpl userDetails) {
+        String jwtToken = generateTokenFromUser(userDetails);
+        return ResponseCookie.from(jwtCookie, jwtToken)
+                .path("/api")
+                .maxAge(60 * 60)
+                .httpOnly(false)
+                .build();
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(jwtCookie, null)
+                .path("/api")
+                .build();
+    }
+
     // generateTokenFromUser
     public String generateTokenFromUser(UserDetails userDetails) {
         String username = userDetails.getUsername();

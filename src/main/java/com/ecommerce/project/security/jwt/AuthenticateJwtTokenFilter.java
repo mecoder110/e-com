@@ -34,7 +34,8 @@ public class AuthenticateJwtTokenFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            String jwtToken = jwtUtils.getJwtFromHeader(request);
+            // String jwtToken = jwtUtils.getJwtFromHeader(request);
+            String jwtToken = jwtUtils.getJwtFromCookie(request);
             logger.debug("JWT token : {}", jwtToken);
             if (jwtToken != null && jwtUtils.validateJwtToken(jwtToken)) {
                 String userName = jwtUtils.extractUsernameFromJwtToken(jwtToken);
